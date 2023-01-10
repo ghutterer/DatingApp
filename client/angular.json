@@ -65,47 +65,45 @@
         },
         "serve": {
           "options": {
-            
-              "sslCert": "./ssl/server.crt",
-              "sslKey": "./ssl/server.key",
-              "ssl": true
-            },
-            "builder": "@angular-devkit/build-angular:dev-server",
-            "configurations": {
-              "production": {
-                "browserTarget": "client:build:production"
-              },
-              "development": {
-                "browserTarget": "client:build:development"
-              }
-            },
-            "defaultConfiguration": "development"
+            "sslCert": "./ssl/server.crt",
+            "sslKey": "./ssl/server.key",
+            "ssl": true
           },
-          "extract-i18n": {
-            "builder": "@angular-devkit/build-angular:extract-i18n",
-            "options": {
-              "browserTarget": "client:build"
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "client:build:production"
+            },
+            "development": {
+              "browserTarget": "client:build:development"
             }
           },
-          "test": {
-            "builder": "@angular-devkit/build-angular:karma",
-            "options": {
-              "main": "src/test.ts",
-              "polyfills": "src/polyfills.ts",
-              "tsConfig": "tsconfig.spec.json",
-              "karmaConfig": "karma.conf.js",
-              "assets": [
-                "src/favicon.ico",
-                "src/assets"
-              ],
-              "styles": [
-                "src/styles.css"
-              ],
-              "scripts": []
-            }
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "client:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.css"
+            ],
+            "scripts": []
           }
         }
       }
     }
   }
-
+}
