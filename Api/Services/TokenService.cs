@@ -1,9 +1,9 @@
-﻿using Api.Entities;
-using Api.Interfaces;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Api.Entities;
+using Api.Interfaces;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Api.Services
 {
@@ -19,7 +19,8 @@ namespace Api.Services
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.NameId, user.UserName)
+                new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
             };
 
 
