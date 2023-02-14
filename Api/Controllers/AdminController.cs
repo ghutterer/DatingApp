@@ -1,9 +1,11 @@
 
 
 using Api.Entities;
+using Api.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
@@ -12,9 +14,13 @@ namespace Api.Controllers
     {
 
         private readonly UserManager<AppUser> userManager;
+        private readonly IUnitOfWork uow;
+        private readonly IPhotoService photoService;
 
-        public AdminController(UserManager<AppUser> userManager)
+        public AdminController(UserManager<AppUser> userManager, IUnitOfWork uow, IPhotoService photoService)
         {
+            this.photoService = photoService;
+            this.uow = uow;
             this.userManager = userManager;
         }
 
@@ -65,9 +71,59 @@ namespace Api.Controllers
 
         [Authorize(Policy = "ModerateFotoRole")]
         [HttpGet("photos-to-moderate")]
-        public ActionResult GetFotosWithModeration()
+        public async Task<ActionResult> GetFotosWithModeration()
         {
-            return Ok("Admins or moderators can see this");
+            var photos = await this.uow.PhotoRepository.GetUnapprovedPhotos();
+
+            return Ok(photos);
         }
+
+        [Authorize(Policy = "ModerateFotoRole")]
+        [HttpPost("approve-photo/{photoId}")]
+        public async Task<ActionResult> ApprovePhoto(int photoId)
+        {
+            var photo = await this.uow.PhotoRepository.GetPhotoById(photoId);
+
+            if (photo == null) return NotFound("Could not find photo");
+            photo.IsApproved = true;
+
+            var user = await this.uow.UserRepository.GetUserByPhotoId(photoId);
+
+            if (!user.Photos.Any(x => x.IsMain)) photo.IsMain = true;
+
+            await this.uow.Complete();
+
+            return Ok();
+        }
+
+        [Authorize(Policy = "ModerateFotoRole")]
+        [HttpPost("reject-photo/{photoId}")]
+
+        public async Task<ActionResult> RejectPhoto(int photoId)
+        {
+            var photo = await this.uow.PhotoRepository.GetPhotoById(photoId);
+
+            if (photo.PublicId != null)
+            {
+                var result = await this.photoService.DeletePhotoAsync(photo.PublicId);
+                if (result.Result == "ok")
+                {
+                    this.uow.PhotoRepository.RemovePhoto(photo);
+                }
+
+
+            }
+            else
+            {
+                this.uow.PhotoRepository.RemovePhoto(photo);
+            }
+
+            await this.uow.Complete();
+
+            return Ok();
+
+
+        }
+
     }
 }

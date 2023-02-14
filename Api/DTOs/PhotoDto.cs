@@ -7,5 +7,7 @@ namespace Api.DTOs
 
         public bool IsMain { get; set; }
 
+        public bool isApproved { get; set; }
+
     }
 }
